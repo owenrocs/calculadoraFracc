@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="author" content="Owen Rosales">
+        <!-- Codigo DTL ejecutado por Django -->
+        {% load static%}
+        <link rel="stylesheet" href="{% static 'styles.css'%}" type="text/css"/>
+    </head>
+    
+    <body>
+        
+        <center>
+            <h1>Bienvenido a Fraction Odyssey</h1>
+            <hr>
+        </center>
+
+        <form action = "proceso" method = "POST">
+            <!--Administrar cuestiones de seguridad para procesar la peticion POST-->
+            {% csrf_token%}
+            <input type = "text" name = "nombre">
+            <input type = "submit"/>
+
+        </form>
+
+        <!--Boton para seleccionar la operacion a realizar-->
+        <button action = "Video" method = "GET">
+            
+        </button>
+
+        
+
+
+    </body>
+</html>
