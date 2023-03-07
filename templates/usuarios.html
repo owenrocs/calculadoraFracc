@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="author" content="Owen Rosales">
+        {% load static%}
+        
+    </head>
+    <body>
+        <h1> Lista de Jugadores</h1>
+        <div class="login-box">
+            <!-- Import usuarios y enlistarlos en tablas-->
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Grupo</th>
+                        <th scope="col">Grado</th>
+                        <th scope="col">Numero de lista</th>
+                    </tr>
+                </thead>
+                <!--Jalar atributos de la tabla-->
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        {% for elemento in usuario %}
+                        <th scope="row">{{elemento}}</th>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+          </div>
+    </body>
+</html>
