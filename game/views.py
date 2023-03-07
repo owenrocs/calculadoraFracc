@@ -100,22 +100,57 @@ def division(request):
     resultado_json = resultado.toJSON()
     return HttpResponse(resultado_json, content_type = "text/json-comment-filtered")
 
+@csrf_exempt
 def usuarios(request):
-    #Conexion a la base de datos
-    conexion = sqlite3.connect('db.sqlite3')
-    #Crear un cursor
-    cursor = conexion.cursor()
-    # #Ejecutar una consulta
-    res = cursor.execute("SELECT * FROM usuarios")
-    #Obtener los resultados
-    resultado = res.fetchall()
-    # For para imprimir los resultados en forma de tabla
-    #for fila in resultado:
-    #    id, grupo, grado, numero = registro
-    #Cerrar la conexion
-    #conexion.close()
-    #Retornar los resultados
-    return render(request, 'usuarios.html', {'usuarios': resultado})
+    if request.method == 'GET':
+        #Conexion a la base de datos
+        conexion = sqlite3.connect('db.sqlite3')
+        #Crear un cursor
+        cursor = conexion.cursor()
+        # #Ejecutar una consulta
+        res = cursor.execute("SELECT * FROM usuarios")
+        #Obtener los resultados
+        resultado = res.fetchall()
+        # For para imprimir los resultados en forma de tabla
+        #for fila in resultado:
+        #    id, grupo, grado, numero = registro
+        #Cerrar la conexion
+        #conexion.close()
+        #Retornar los resultados
+        return render(request, 'usuarios.html', {'usuarios': resultado})
+    
+    elif request.method == 'POST':
+        #Comando para usar formato unicode -> body codificado en UTF-8
+        body = request.body.decode('utf-8')
+        body = loads(body)
+        grupo = body['grupo']
+        grado = body['grado']
+        numero = body['numero']
+        #print(str(grupo) + " " + str(grado) + " " + str(numero))
+        conexion = sqlite3.connect('db.sqlite3')
+        #Crear un cursor
+        cursor = conexion.cursor()
+        #Ejecutar un insert
+        res = cursor.execute("INSERT INTO usuarios (grupo, grado, num_lista) VALUES (?,?,?)", (grupo, grado, numero))
+        conexion.commit()
+        return HttpResponse("Usuario agregado")
+    
+    elif request.method == 'DELETE':
+        #Comando para usar formato unicode -> body codificado en UTF-8
+        body = request.body.decode('utf-8')
+        body = loads(body)
+        grupo = body['grupo']
+        grado = body['grado']
+        numero = body['numero']
+        #print(str(grupo) + " " + str(grado) + " " + str(numero))
+        conexion = sqlite3.connect('db.sqlite3')
+        #Crear un cursor
+        cursor = conexion.cursor()
+        #Ejecutar un delete
+        res = cursor.execute("DELETE FROM usuarios WHERE grupo = ? AND grado = ? AND num_lista = ?", (grupo, grado, numero))
+        conexion.commit()
+        return HttpResponse("Usuario eliminado")
+
 
 @csrf_exempt
 def usuarios_p(request):
@@ -147,7 +182,6 @@ def usuarios_d(request):
     #Crear un cursor
     cursor = conexion.cursor()
     #Ejecutar un delete
-    #sql_query = "DELETE FROM usuarios WHERE grupo = ? AND grado = ? AND num_lista = ?"
     res = cursor.execute("DELETE FROM usuarios WHERE grupo = ? AND grado = ? AND num_lista = ?", (grupo, grado, numero))
     conexion.commit()
     return HttpResponse("Usuario eliminado")
