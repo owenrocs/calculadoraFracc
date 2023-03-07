@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from fractions import Fraction
 from django.views.decorators.csrf import csrf_exempt
 from json import loads, dumps
+import sqlite3
+
 # loads -> convierte un string a un objeto JSON
 # dumps -> convierte un objeto JSON a un string
 
@@ -97,3 +99,19 @@ def division(request):
     resultado = Fraccion(num_resultado,den_resultado)
     resultado_json = resultado.toJSON()
     return HttpResponse(resultado_json, content_type = "text/json-comment-filtered")
+
+def usuarios(request):
+    #Conexion a la base de datos
+    conexion = sqlite3.connect('db.sqlite3')
+    #Crear un cursor
+    cursor = conexion.cursor()
+    # #Ejecutar una consulta
+    res = cursor.execute("SELECT * FROM usuarios")
+    
+    #print (resultado)
+    #Obtener los resultados
+    resultado = res.fetchall()
+    #Cerrar la conexion
+    conexion.close()
+    #Retornar los resultados
+    return HttpResponse(resultado)
