@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from fractions import Fraction
 from django.views.decorators.csrf import csrf_exempt
 from json import loads, dumps
+from django.shortcuts import redirect
+from random import randrange
 import sqlite3
 
 # loads -> convierte un string a un objeto JSON
@@ -185,3 +187,42 @@ def usuarios_d(request):
     res = cursor.execute("DELETE FROM usuarios WHERE grupo = ? AND grado = ? AND num_lista = ?", (grupo, grado, numero))
     conexion.commit()
     return HttpResponse("Usuario eliminado")
+
+############ Clase en zoom martes
+
+@csrf_exempt
+#servicio endpoint de validación de usuarios
+#entrada: { "id_usuario" :"usuario","pass" : "contrasenia"}
+#salida: {"estatus":True}
+@csrf_exempt
+def valida_usuario(request):
+    body = request.body.decode('UTF-8')
+    eljson = loads(body)
+    usuario  = eljson['id_usuario']
+    contrasenia = eljson['pass']
+    print(usuario+contrasenia)
+    #con = sqlite3.connect("db.sqlite3")
+    #cur = con.cursor()
+    #res = cur.execute("SELECT * FROM usuarios WHERE id_usuario=? AND password=?",(str(usuario), str(contrasenia)))
+    #si el usuario es correcto regresar respuesta exitosa 200 OK
+    #en caso contrario regresar estatus falso
+    return HttpResponse('{"estatus": true}')
+
+def grafica(request):
+    h_var = 'x'
+    v_var = 'y'
+    data = [['id_usuario', 'minutos_jugados', 'puntaje'],
+            ['1', 10, 20],
+            ['2', 20, 30],
+            ['3', 30, 40],
+            ['4', 40, 50],
+            ['5', 50, 60],
+            ['6', 60, 70]]
+    # loop to append list of three random values to data object
+    for i in range(7):
+        data.append([randrange(101),randrange(101)])
+    # convert data object to JSON
+    h_var_JSON = json.dumps(h_var)
+    v_var_JSON = json.dumps(v_var)
+    modified_data = json.dumps(data)
+    return render(request, 'charts.html', {'values':modified_data, 'h_titlw':h_var_JSON, 'v_title':v_var_JSON})
