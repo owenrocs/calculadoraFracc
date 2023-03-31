@@ -1,16 +1,41 @@
 from django.shortcuts import render
+from rest_framework import viewsets
+from . serializers import RetoSerializer,JugadorSerializer,UsuariosSerializer,PartidasSerializer
+from .models import Reto,Jugadores,Usuarios,Partidas
 from django.http import HttpResponse
-from fractions import Fraction
 from django.views.decorators.csrf import csrf_exempt
-from json import loads, dumps
-from django.shortcuts import redirect
+from json import loads,dumps
+import sqlite3 
+import requests
 from random import randrange
-import sqlite3
 
 # loads -> convierte un string a un objeto JSON
 # dumps -> convierte un objeto JSON a un string
 
 # Create your views here.
+@csrf_exempt
+def registro(request):
+    body_unicode = request.body.decode('utf-8')
+    body = loads(body_unicode)
+    username = body['username']
+    password = body['password']
+    group = body['group']
+    datos = (username,password,group)
+    message ={'message': 'Registro exitoso' }
+    return HttpResponse(dumps(message),datos, content_type='application/json')
+
+def juego(request):
+    body_unicode = request.body.decode('utf-8')
+    body = loads(body_unicode)
+    username = body['username']
+
+    if username == 'eg_user' :
+        message = {'message': 'Usuario autenticado'}
+    else:
+        message = {'message': 'Usuario no autenticado'}
+    return HttpResponse(dumps(message), content_type='application/json')
+
+
 class Fraccion:
     def __init__(self, numerador, denominador):
         self.numerador = numerador
@@ -188,7 +213,6 @@ def usuarios_d(request):
     conexion.commit()
     return HttpResponse("Usuario eliminado")
 
-############ Clase en zoom martes
 
 @csrf_exempt
 #servicio endpoint de validación de usuarios
@@ -207,6 +231,28 @@ def valida_usuario(request):
     #si el usuario es correcto regresar respuesta exitosa 200 OK
     #en caso contrario regresar estatus falso
     return HttpResponse('{"estatus": true}')
+
+
+### Tarea REST framework ###
+class RetoViewSet(viewsets.ModelViewSet):
+    queryset = Reto.objects.all() #all recupera todos los registro de la entidada Reto
+    serializer_class = RetoSerializer
+    
+#### "METODO REST #####
+class JugadoresViewSet(viewsets.ModelViewSet): #va hacer las 4 vistas(insertar, enlistar, etc) de tipo jugador
+    queryset = Jugadores.objects.all() #select * from Calculadora.Jugadores
+    serializer_class = JugadorSerializer
+
+class PartidasViewSet(viewsets.ModelViewSet):
+    queryset = Partidas.objects.all() #all recupera todos los registro de la entidada Reto
+    serializer_class = PartidasSerializer
+
+class UsuariosViewSet(viewsets.ModelViewSet):
+    queryset = Usuarios.objects.all() #all recupera todos los registro de la entidada Reto
+    serializer_class = UsuariosSerializer
+###
+
+# Graficas
 
 def grafica(request):
     #h_var : The title for horizontal axis

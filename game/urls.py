@@ -1,7 +1,16 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework import routers
 from . import views
 
+router = routers.DefaultRouter()
+router.register(r'reto', views.RetoViewSet)
+router.register(r'jugador', views.JugadoresViewSet)
+router.register(r'partida', views.PartidasViewSet)
+router.register(r'usuario', views.UsuariosViewSet)
+
 urlpatterns = [
+    path('api',include(router.urls)),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('', views.index, name='index'),
     path('proceso', views.proceso, name = 'proceso'),
     path('bienvenida', views.bienvenida, name = 'bienvenida'),
@@ -14,4 +23,5 @@ urlpatterns = [
     path('usuarios_d', views.usuarios_d, name = 'usuarios_d'),
     path('valida_usuario', views.valida_usuario, name = 'valida_usuario'),
     path('grafica', views.grafica, name = 'grafica'),
+    path('barras', views.barras, name = 'barras'),
 ]
