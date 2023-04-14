@@ -357,7 +357,6 @@ def bubbleChart(request):
     elJSON = {'graphData': data, 'titulo': titulo_formato, 'subtitulo': subtitulo_formato}
     return render(request,'bubble.html',elJSON)
 
-
 '''
     # IDEA DE FORM PARA REGISTRO
     # Punto importante: Creacion de user_id

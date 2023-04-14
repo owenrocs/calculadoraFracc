@@ -24,6 +24,7 @@ urlpatterns = [
     path('valida_usuario', views.valida_usuario, name = 'valida_usuario'),
     path('grafica', views.grafica, name = 'grafica'),
     path('barras', views.barras, name = 'barras'),
+    # End points para la API de consulta
     path('consultPartidas', views.consultPartidas, name = 'consultPartidas'),
     #Path para grafica de burbuja
     path('bubbleChart', views.bubbleChart, name = 'bubbleChart'),
