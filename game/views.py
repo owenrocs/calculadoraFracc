@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from . serializers import RetoSerializer,JugadorSerializer,UsuariosSerializer,PartidasSerializer
 from .models import Reto,Jugadores,Usuarios,Partidas
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from json import loads,dumps
 import sqlite3 
@@ -153,6 +153,7 @@ def usuarios(request):
         grupo = body['grupo']
         grado = body['grado']
         numero = body['numero']
+        #role = 
         #print(str(grupo) + " " + str(grado) + " " + str(numero))
         conexion = sqlite3.connect('db.sqlite3')
         #Crear un cursor
@@ -250,10 +251,8 @@ class PartidasViewSet(viewsets.ModelViewSet):
 class UsuariosViewSet(viewsets.ModelViewSet):
     queryset = Usuarios.objects.all() #all recupera todos los registro de la entidada Reto
     serializer_class = UsuariosSerializer
-###
 
 # Graficas
-
 def grafica(request):
     #h_var : The title for horizontal axis
     h_var = 'X'
@@ -299,6 +298,9 @@ def grafica(request):
     # dictiory shown below so that they can be displayed on the home screen
     return render(request,"charts.html",{'values':modified_data,\
         'h_title':h_var_JSON,'v_title':v_var_JSON})
+## Dentro de grafica solo se hace la invocacion de servicio
+# Las consultas de datos se hacen en los servicios CRUD
+# Servicios CRUD
 
 def barras(request):
     '''
@@ -327,3 +329,83 @@ def barras(request):
         return render(request,'barras.html',elJSON)
     else:
         return HttpResponse("<h1> No hay registros a mostrar</h1>")
+
+# Consulta de datos para graficación con Google Charts    
+def consultPartidas(request):
+    entries = Partidas.objects.all()
+    data = [['ID', 'Minutos jugados', 'Puntaje', 'ID Usuario', 'Tamaño (puntaje)']]
+    for record in entries:
+        idNum = str(record.id)
+        minutos = int(record.minutos_jugados)
+        puntaje = int(record.puntaje)
+        id_usuario = str(record.id_usuario)    
+        tamano = int(record.puntaje)    
+
+        data.append([idNum, minutos, puntaje, id_usuario, tamano])
+    data_json = dumps({'graphData': data})
+    return HttpResponse(data_json, content_type='application/json')
+
+#Funcion para graficar datos de partidas en graficas de burbuja
+def bubbleChart(request):
+    url = "http://127.0.0.1:8000/consultPartidas"
+    response = requests.get(url)
+    data = loads(response.content)['graphData']
+    titulo = 'Videojuego Odyssey'
+    titulo_formato = dumps(titulo)
+    subtitulo= 'Total de minutos por jugador'
+    subtitulo_formato = dumps(subtitulo)
+    elJSON = {'graphData': data, 'titulo': titulo_formato, 'subtitulo': subtitulo_formato}
+    return render(request,'bubble.html',elJSON)
+
+
+'''
+    # IDEA DE FORM PARA REGISTRO
+    # Punto importante: Creacion de user_id
+
+    def nuevoUsuarioAlumno(request):
+        if (request.method == 'POST'):#POST
+            form = CrearAlumnoForm(request.POST)
+            if(form.is_valid()):
+                # Atributos del formulario
+                grupo = form.cleaned_data['grupo']
+                listNumber = form.cleaned_data['listNumber']
+                password = form.cleaned_data['password']
+                # Atributo role predefinido y no modificable en el form
+                role = 'alumno'
+                # Creacion de user_id como un string
+                userID = grupo + '_' +listNumber
+                return HttpResponse('Nuevo usuario creado '+user_id)
+
+                ### Creación de registro directo en BD
+                # nuevo_registro = Alumno.objects.create(user_id=userID, password=password, grupo=grupo, list_num=listNumber, role=role)
+                # nuevo_registro.save()
+
+                #invoca el servicio de creación de usuario
+                #Creación de registro usando api REST
+                url = "http://127.0.0.1:8000/apireto/"
+                header = {
+                "Content-Type":"application/json"
+                }
+                payload = {   
+                "user_id": userID,
+                "password": password,
+                "grupo": grupo,
+                "list_num": listNumber,
+                "role": role
+                }
+                result = requests.post(url,  data= dumps(payload), headers=header)
+                if result.status_code == 201:
+                    return HttpResponse('Nuevo usuario creado '+nombre_usuario)
+                else:
+                    return HttpResponse('Error al crear el usuario ')
+                
+        else:#GET
+            form = CrearAlumnoForm
+            return render(request, 'crearReto.html',{'form':form})
+
+    class CrearAlumnoForm(forms.Form):
+        grupo = forms.CharField(label='Grupo', max_length=2)
+        listNumber = forms.CharField(label='Numero de lista', max_length=3)
+        password = forms.CharField(label='Contraseña', max_length=20)
+
+'''
