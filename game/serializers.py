@@ -23,3 +23,6 @@ class PartidasSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Partidas
         fields = ('id','fecha','id_usuario','minutos_jugados','puntaje')
+
+# Path: game\urls.py
+# Modelos para repositorio personals
