@@ -408,3 +408,29 @@ def bubbleChart(request):
         password = forms.CharField(label='Contraseña', max_length=20)
 
 '''
+
+
+def nuevoUsuarioAlumno(request):
+    if (request.method == 'POST'):#POST
+        form = Usuarios(request.POST)
+        if(form.is_valid()):
+            # Atributos del formulario
+            grupo = form.cleaned_data['grupo']
+            listNumber = form.cleaned_data['listNumber']
+            password = form.cleaned_data['password']
+            # Atributo role predefinido y no modificable en el form
+            role = 'alumno'
+            # Creacion de user_id como un string
+            userID = grupo + '_' +listNumber
+            return HttpResponse('Nuevo usuario creado '+ userID)
+
+            ### Creación de registro directo en BD
+            nuevo_registro = Alumno.objects.create(user_id=userID, password=password, grupo=grupo, list_num=listNumber, role=role)
+            nuevo_registro.save()
+
+            # Verificar status code de insertar datos en BD correctamente con models
+            result = requests.post(url,  data= dumps(payload), headers=header)
+            if result.status_code == 201:
+                return HttpResponse('Nuevo usuario creado '+nombre_usuario)
+            else:
+                return HttpResponse('Error al crear el usuario ')
